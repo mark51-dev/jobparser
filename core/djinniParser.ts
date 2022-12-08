@@ -15,7 +15,7 @@ enum Urls {
 class DjinniParser extends AbstractParser {
 	$: any = null;
 	async login(): Promise<void> {
-		const result = await request.get(Urls.mainUrl);
+		await request.get(Urls.mainUrl);
 		const csrf_token = cookieJar
 			.getCookieString(Urls.mainUrl)
 			.split(' ')[0]
@@ -40,9 +40,7 @@ class DjinniParser extends AbstractParser {
 		} catch (e: any) {}
 		const res = await request.get(Urls.mainUrl + '/jobs/');
 
-		this.$ = await new Promise((resolve) => {
-			return resolve(cheerio.load(res));
-		});
+		this.$ = await new Promise((resolve) => resolve(cheerio.load(res)));
 	}
 	async parse(): Promise<void> {
 		this.$('.list-jobs__item.list__item').each((index: any, item: any) => {

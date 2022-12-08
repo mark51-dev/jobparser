@@ -20,8 +20,8 @@ class DjinniParser extends AbstractParser {
 		try {
 			await request.post('https://djinni.co/login?from=frontpage_main', {
 				form: {
-					email: 'daranto@ukr.net',
-					password: 'Couj9boaC',
+					email: '',
+					password: '',
 					csrfmiddlewaretoken: csrf_token,
 				},
 				headers: {

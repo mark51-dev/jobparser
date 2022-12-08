@@ -85,7 +85,7 @@ class DjinniParser extends AbstractParser {
 		const [day, month, year] = text.split(' ');
 
 		const index = months.findIndex(
-			(monthText) => monthText.toLocaleLowerCase() === month
+			(monthText) => monthText.toLowerCase() === month
 		);
 
 		return new Date(`${index}-${day}-${year}`).getTime();

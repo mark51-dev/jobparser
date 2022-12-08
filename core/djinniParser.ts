@@ -7,25 +7,30 @@ request = request.defaults({
 	jar: cookieJar,
 });
 
+enum Urls {
+	mainUrl = 'https://djinni.co',
+	loginUrl = 'https://djinni.co/login?from=frontpage_main',
+}
+
 class DjinniParser extends AbstractParser {
 	$: any = null;
 	async login(): Promise<void> {
-		const result = await request.get('https://djinni.co');
+		const result = await request.get(Urls.mainUrl);
 		const csrf_token = cookieJar
-			.getCookieString('https://djinni.co')
+			.getCookieString(Urls.mainUrl)
 			.split(' ')[0]
 			.split('=')[1]
 			.replace(';', '');
 
 		try {
-			await request.post('https://djinni.co/login?from=frontpage_main', {
+			await request.post(Urls.loginUrl, {
 				form: {
 					email: '',
 					password: '',
 					csrfmiddlewaretoken: csrf_token,
 				},
 				headers: {
-					referer: 'https://djinni.co/login?from=frontpage_main',
+					referer: Urls.loginUrl,
 				},
 				options: {
 					simple: true,
@@ -33,22 +38,17 @@ class DjinniParser extends AbstractParser {
 				},
 			});
 		} catch (e: any) {}
-		const res = await request.get('https://djinni.co/jobs/');
+		const res = await request.get(Urls.mainUrl + '/jobs/');
 
 		this.$ = await new Promise((resolve) => {
 			return resolve(cheerio.load(res));
 		});
 	}
 	async parse(): Promise<void> {
-		console.log('Djinni start');
-
-		console.log('---------------');
 		this.$('.list-jobs__item.list__item').each((index: any, item: any) => {
 			console.log(this.$(item).find('.profile span').text().trim());
 			console.log(this.$(item).find('.profile').attr('href'));
 		});
-
-		console.log('Djinni end');
 	}
 }
 

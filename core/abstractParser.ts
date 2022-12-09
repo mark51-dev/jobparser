@@ -1,4 +1,7 @@
+import { IJobPost } from './interfaces/post.interface';
+
 export abstract class AbstractParser {
+	private jobList: IJobPost[] = [];
 	constructor() {
 		this.execute();
 	}

@@ -54,14 +54,17 @@ class DjinniParser extends AbstractParser {
 		} catch (e: any) {}
 	}
 	async parse(): Promise<void> {
-		await this.getLatestJobs();
+		const jobUrl: any = await this.getFirstJobUrl();
+		await this.getJobInfoByUrl(jobUrl);
 	}
-	private async getLatestJobs(): Promise<void> {
-		const res = await request
-			.get('https://djinni.co/jobs/416474-middle-senior-react-developer/')
+	private async getJobInfoByUrl(JobUrl: string): Promise<void> {
+		return request
+			.get(`https://djinni.co${JobUrl}`)
 			.then((res: any) => {
 				const $ = cheerio.load(res);
+				const jobTitle = $('.detail--title-wrapper h1').text().trim();
 				const jobDescription = $('.job-post--short-description').text().trim();
+				const companyName = $('.job-details--title').text().trim();
 				const jobText = $(
 					'.job-post--short-description + .profile-page-section'
 				)
@@ -70,14 +73,23 @@ class DjinniParser extends AbstractParser {
 				const dateVacancy = this.getTimeFromVacancy(
 					$('.text-muted').text().trim()
 				);
-				return {
+				console.log({
+					jobTitle,
 					jobDescription,
 					jobText,
 					dateVacancy,
+					companyName,
+				});
+
+				return {
+					jobTitle,
+					jobDescription,
+					jobText,
+					dateVacancy,
+					companyName,
 				};
 			})
 			.catch((err: Error) => console.log('Error'));
-		console.log(res);
 	}
 
 	private getTimeFromVacancy(dateText: any): number {
@@ -91,9 +103,17 @@ class DjinniParser extends AbstractParser {
 		return new Date(`${index}-${day}-${year}`).getTime();
 	}
 
-	// private parseDetails() {
-	// 	const url = Urls.mainUrl + '/jobs/504582-unity-mobile-game-developer/';
-	// }
+	private async getFirstJobUrl(): Promise<string> {
+		return request
+			.get(Urls.mainUrl + '/jobs/')
+			.then((res: any) => {
+				const $ = cheerio.load(res);
+				const jobUrl = $('.profile').first().attr('href').trim();
+				console.log(jobUrl);
+				return jobUrl;
+			})
+			.catch(() => console.log('Cant get latest job'));
+	}
 }
 
 new DjinniParser();

@@ -1,5 +1,6 @@
 export interface IJobPost {
-	company: string;
+	jobTitle: string;
+	companyName: string;
 	jobDescription?: string;
 	jobText: string;
 	dateVacancy: number;
